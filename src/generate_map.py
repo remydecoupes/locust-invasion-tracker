@@ -102,9 +102,6 @@ class MapGenerator:
         m.get_root().html.add_child(folium.Element(title_html))
         
         # Créer un cluster de marqueurs pour mieux gérer les lieux proches
-
-        # old marker
-        """
         marker_cluster = MarkerCluster(name="Articles").add_to(m)
         
         
@@ -132,63 +129,7 @@ class MapGenerator:
                 marker_count += 1
         
         print(f"   ✅ {marker_count} marqueurs ajoutés")
-        """
-
-        # new marker with time management:
-        features = []
-
-        for item in entities_data:
-            article = item['article']
-            locations = item['locations']
-
-            article_time = self.parse_date(article.get("published"))
-
-            if not article_time:
-                continue
-
-            for location in locations:
-                popup_html = self.create_popup_html(article, location)
-
-                feature = {
-                    "type": "Feature",
-                    "geometry": {
-                        "type": "Point",
-                        "coordinates": [location['longitude'], location['latitude']],
-                    },
-                    "properties": {
-                        "time": article_time,
-                        "popup": popup_html,
-                        "tooltip": f"{location['name']}: {article['title'][:50]}...",
-                        "icon": "circle",
-                        "iconstyle": {
-                            "fillColor": "red",
-                            "fillOpacity": 0.8,
-                            "stroke": "true",
-                            "radius": 6
-                        },
-                    },
-                }
-
-                features.append(feature)
-
-        print(f"   ✅ {len(features)} points temporels ajoutés")
-
-        TimestampedGeoJson(
-            {
-                "type": "FeatureCollection",
-                "features": features,
-            },
-            period="P1D",              # Pas de temps = 1 jour
-            add_last_point=True,
-            auto_play=False,
-            loop=False,
-            max_speed=1,
-            loop_button=True,
-            date_options="YYYY-MM-DD",
-            time_slider_drag_update=True,
-        ).add_to(m)
-
-
+        
         # Ajouter un layer control
         folium.LayerControl().add_to(m)
         
@@ -229,6 +170,7 @@ class MapGenerator:
         
         # Sauvegarder
         self.save_map(map_obj)
+        
         
         print("\n" + "=" * 60)
         print("✅ Carte générée avec succès!")
