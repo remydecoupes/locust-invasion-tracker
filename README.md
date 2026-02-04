@@ -15,6 +15,12 @@ Display a map that plot articles metadata dealing with Locust invasion.
 
 Connect to [[website](https://remydecoupes.github.io/locust-invasion-tracker/)]
 
+<p align="center">
+  <img src="img/map_illustration.png" width="400"/>
+  <br>
+  <em>Fig. 1 - Overview of the Madagascar map with localized articles</em>
+</p>
+
 ## Improvements
 
 - Map
