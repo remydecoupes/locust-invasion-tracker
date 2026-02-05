@@ -3,14 +3,19 @@
 RSS Scraper for Google News
 """
 
+import time
 import feedparser
 import json
 import os
 import re
 from datetime import datetime
-from typing import List, Dict
+from typing import List, Dict, Optional
 import requests
 from bs4 import BeautifulSoup
+from selenium import webdriver
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.common.by import By
 
 
 class GoogleNewsRSScraper:
@@ -23,6 +28,16 @@ class GoogleNewsRSScraper:
             "acridien", "invasion", "essaim",
             "madagascar", "malgache"
         ]
+        self.driver = webdriver.Chrome()
+        self.wait = WebDriverWait(self.driver, 10)
+        self.driver.get("https://news.google.com/rss/articles/CBMikgFBVV95cUxNVTQtYndlMjRSSlBKaEd5MmxaVHlGT1NkV0VFbEFTMFlmTXp2aW1YRWlrYmxJS0pjS1phZTlObm1ER1VtNWxzVnh4M3ZWVVhhWDJLTVJkUHRiOGJtb3NXekNOWEgybTNCOER5NjV4TkNwcUczTlZ0WnhxVHlMcFdLVGhyTTFrM1N3ODRpNF9GQ21EUQ?oc=5")
+
+        # Accept cookies if present (EU popup)
+        try:
+            agree = self.wait.until(EC.element_to_be_clickable((By.XPATH, "//button//*[text()='Accept all']")))
+            agree.click()
+        except:
+            pass
         
         # URL  flux RSS Google News for: Madagascar + criquets
         self.rss_url = "https://news.google.com/rss/search?q=criquet+madagascar&hl=fr&gl=MG&ceid=MG:fr"
@@ -67,7 +82,9 @@ class GoogleNewsRSScraper:
             "published": entry.get('published', ''),
             "summary": entry.get('summary', ''),
             "source": entry.get('source', {}).get('title', 'Google News'),
-            "scraped_at": datetime.now().isoformat()
+            "scraped_at": datetime.now().isoformat(),
+            "full_content": None,  # Sera rempli par fetch_full_content
+            "content_fetched": False
         }
     
     def load_existing_articles(self) -> List[Dict]:
@@ -81,6 +98,101 @@ class GoogleNewsRSScraper:
         except Exception as e:
             print(f"[error]: could not load artciles: {e}")
             return []
+        
+        
+    def fetch_full_content(self, url: str, max_retries: int = 3) -> Optional[Dict]:
+        """Get content from webpages"""     
+        
+        for attempt in range(max_retries):
+            try:
+                print(f"      Get webpage content (Attempt {attempt + 1}/{max_retries})...")
+                self.driver.get(url)
+
+                # consent popup handling
+                try: # classic
+                    agree = WebDriverWait(self.driver, 5).until(EC.element_to_be_clickable((By.XPATH, "//button//*[text()='Accept all']")))
+                    agree.click()
+                except:
+                    try: # with dov dodomi
+                        agree = self.wait.until(EC.element_to_be_clickable((By.ID, "didomi-notice-agree-button")))
+                        agree.click()
+                    except:
+                        print("      [error]: could not accept cookie for this website")
+
+                
+                response = self.driver.page_source            
+
+                # Parse  HTML
+                soup = BeautifulSoup(response, 'html.parser')
+                
+                # Remove unnecessary web 
+                for element in soup.find_all(['script', 'style', 'nav', 'footer', 'aside', 'header']):
+                    element.decompose()
+                
+                # get main content
+                main_content = None
+                
+                # Priority 1 : tag article
+                article = soup.find('article')
+                if article:
+                    main_content = article
+                
+                # Priority 2 : div with "content"
+                if not main_content:
+                    content_classes = ['article-content', 'post-content', 'entry-content', 
+                                      'article-body', 'story-body', 'main-content']
+                    for class_name in content_classes:
+                        content_div = soup.find('div', class_=re.compile(class_name, re.I))
+                        if content_div:
+                            main_content = content_div
+                            break
+                
+                # Priority 3 : take the whole tag "body"
+                if not main_content:
+                    main_content = soup.find('body')
+                
+                if main_content:
+                    # Extract texts
+                    text = main_content.get_text(separator='\n', strip=True)
+                    
+                    # Remove duplicated lines
+                    lines = [line.strip() for line in text.split('\n') if line.strip()]
+                    clean_text = '\n'.join(lines)
+                    
+                    
+                    # Extract title
+                    page_title = soup.find('title')
+                    page_title_text = page_title.get_text(strip=True) if page_title else ""
+                    
+                    return {
+                        'text': clean_text,
+                        'page_title': page_title_text,
+                        'word_count': len(clean_text.split()),
+                        'fetched_at': datetime.now().isoformat(),
+                    }
+                else:
+                    print(f"      [error]:  Could not get the main content")
+                    return None
+                
+            except requests.exceptions.Timeout:
+                print(f"      [error] Timeout ")
+                if attempt < max_retries - 1:
+                    time.sleep(2)
+                    continue
+                return None
+                
+            except requests.exceptions.RequestException as e:
+                print(f"     [error] HTTP: {e}")
+                if attempt < max_retries - 1:
+                    time.sleep(2)
+                    continue
+                return None
+                
+            except Exception as e:
+                print(f"      [error]: While extracting: {e}")
+                return None
+        
+        return None
     
     def save_articles(self, articles: List[Dict]):
         """Save articles into a JSON file"""
@@ -117,7 +229,24 @@ class GoogleNewsRSScraper:
                 # Add if new articles
                 if article_data['id'] not in existing_ids:
                     new_articles.append(article_data)
-                    print(f"📰 Nouvel article: {article_data['title'][:60]}...")
+                    print(f" New article: {article_data['title'][:60]}...")
+
+                    # Try to get the full content
+                    full_content = self.fetch_full_content(article_data['link'])
+                    
+                    if full_content:
+                        article_data['full_content'] = full_content
+                        article_data['content_fetched'] = True
+                        print(f"   Get content: {full_content['word_count']} words")
+                    else:
+                        article_data['content_fetched'] = False
+                        print(f"   [error]: Could not extract content from webpages: use RSS metadata instead")
+                    
+                    new_articles.append(article_data)
+                    
+                    # Délai entre les requêtes pour être respectueux
+                    if full_content:
+                        time.sleep(2)
         
         # Enlarge list of articles
         all_articles = existing_articles + new_articles
