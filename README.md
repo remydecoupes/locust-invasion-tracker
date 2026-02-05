@@ -9,7 +9,39 @@ Display a map that plot articles metadata dealing with Locust invasion.
 ["criquet", "criquets", "locust", "locusts", "acridien", "essaim"]
 ```
 3. With SpaCy extract location found in Title/abstract of new article
-4. Display on map
+4. Load Media pages and extrant web content
+5. Extract location from web content
+6. Display on map
+
+```mermaid
+flowchart TD
+
+    subgraph RSS[rss_scraper.py]
+        A[Google News RSS Feeds] --> C[Keyword Filter<br/>criquet, locust, acridien, essaim]
+        C --> D{Relevant Article?}
+        D -- Yes --> E[Extract Title / Abstract / Content]
+        E --> F[Selenium Scraper<br/>Load Media page]
+    end
+
+    subgraph NER[ner_processor.py]
+        F --> G[SpaCy NER<br/>Location Extraction]
+    end
+
+    subgraph MAP[generate_map.py]
+        G --> H[Geocoding API]
+        H --> I[Map Visualization<br/>Leaflet / Folium / etc.]
+    end
+
+    %% Color coding by script
+    classDef rss fill:#cce5ff,stroke:#2b6cb0,stroke-width:2px,color:#000;
+    classDef ner fill:#fff3cd,stroke:#d69e2e,stroke-width:2px,color:#000;
+    classDef map fill:#d4edda,stroke:#2f855a,stroke-width:2px,color:#000;
+
+    %% Apply classes
+    class A,C,D,E,F rss;
+    class G ner;
+    class H,I map;
+```
 
 ## See results
 
@@ -26,5 +58,26 @@ Connect to [[website](https://remydecoupes.github.io/locust-invasion-tracker/)]
 - Map
     - Add time management
     - Deal with too global location (i.e. Madagascar)
-- RSS parser 
-    - Extract link to the article
+
+## Disclaimer & Intended Use
+
+These scripts use **Selenium** to scrape content from **Google News search results**.
+
+They are provided **strictly for educational and research purposes**, with the sole objective of demonstrating:
+- how web automation and scraping tools work,
+- and how information can be gathered and analyzed from press and news sources.
+
+These scripts are **not intended for production use**.
+
+**Do not use these scripts in production or at scale.**  
+Automating access to Google News and scraping content from indexed websites may violate:
+- Google’s Terms of Service,
+- the Terms of Use of the websites being scraped,
+- and potentially applicable laws or regulations.
+
+If you need to collect news data for a real-world application, you should rely on:
+- official APIs (e.g. Google News via third-party APIs, news aggregators),
+- licensed data providers,
+- or explicit permission from content owners.
+
+By using or modifying these scripts, you acknowledge that you are responsible for complying with all applicable terms, conditions, and legal requirements.
