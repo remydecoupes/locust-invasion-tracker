@@ -25,10 +25,10 @@ flowchart TD
 
     subgraph NER[ner_processor.py]
         F --> G[SpaCy NER<br/>Location Extraction]
+        G --> H[Geocoding API]
     end
 
     subgraph MAP[generate_map.py]
-        G --> H[Geocoding API]
         H --> I[Map Visualization<br/>Leaflet / Folium / etc.]
     end
 
