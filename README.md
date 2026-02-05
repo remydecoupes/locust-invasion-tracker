@@ -39,8 +39,8 @@ flowchart TD
 
     %% Apply classes
     class A,C,D,E,F rss;
-    class G ner;
-    class H,I map;
+    class G,H ner;
+    class I map;
 ```
 
 ## See results
