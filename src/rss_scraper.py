@@ -26,7 +26,9 @@ class GoogleNewsRSScraper:
         self.keywords = [
             "criquet", "criquets", "locust", "locusts",
             "acridien", "invasion", "essaim",
-            "madagascar", "malgache"
+            "madagascar", "malgache",
+            "valala", "andiam-balala", "kijeja", "zana-balala",
+            "malagasy", "madagasikara"
         ]
         self.driver = webdriver.Chrome()
         self.wait = WebDriverWait(self.driver, 10)
@@ -68,8 +70,8 @@ class GoogleNewsRSScraper:
         
         # Keyword list
         has_locust_keyword = any(kw in combined_text for kw in 
-                                 ["criquet", "criquets", "locust", "locusts", "acridien", "essaim"])
-        has_madagascar = "madagascar" in combined_text or "malgache" in combined_text
+                                 ["criquet", "criquets", "locust", "locusts", "acridien", "essaim", "valala", "andiam-balala", "kijeja", "zana-balala"])
+        has_madagascar = "madagascar" in combined_text or "malgache" in combined_text or "malagasy" in combined_text or "madagasikara" in combined_text
         
         return has_locust_keyword and has_madagascar
     
