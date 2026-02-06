@@ -4,10 +4,33 @@ Display a map that plot articles metadata dealing with Locust invasion.
 
 ## Pipeline 
 1. Source of data: Google News aggregator (RSS flux)
-2. Filter only relevant articles based on the keyword list: 
-```{python}
-["criquet", "criquets", "locust", "locusts", "acridien", "essaim"]
-```
+2. Filter only relevant articles based on the two keyword list: 
+
+    ```{python}
+        self.thematic_keywords = [
+            # Français
+            "criquet", "criquets", "acridien", "invasion", "essaim",
+            # English
+            "locust", "locusts", "swarm", "outbreak",
+            # Malagasy (approximations courantes)
+            "valala", "andiam-balala", "kijeja", "zana-balala",
+        ]
+
+        self.geo_keywords = [
+            # Country
+            "madagascar", "madagaskar", "malagasy", "malgache", "madagasikara",
+
+            # Old province
+            "antananarivo", "antsiranana", "mahajanga", "toliara", "tuléar", "fianarantsoa", "toamasina", "tamatave",
+
+            # States / provinces
+            "atsimo-andrefana", "androy", "anôsy", "menabe", "melaky",
+            "boeny", "sofia", "diana",
+            "amoron'i mania", "haute matsiatra", "vatovavy fitovinany",
+            "atsinanana", "analanjirofo",
+            "itasy", "vakinankaratra", "alaotra-mangoro", "bongolava",
+        ]
+    ```
 3. With SpaCy extract location found in Title/abstract of new article
 4. Load Media pages and extrant web content
 5. Extract location from web content

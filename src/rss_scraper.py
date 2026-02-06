@@ -23,13 +23,30 @@ class GoogleNewsRSScraper:
         self.data_dir = "data"
         self.articles_file = os.path.join(self.data_dir, "articles.json")
         
-        self.keywords = [
-            "criquet", "criquets", "locust", "locusts",
-            "acridien", "invasion", "essaim",
-            "madagascar", "malgache",
+        self.thematic_keywords = [
+            # Français
+            "criquet", "criquets", "acridien", "invasion", "essaim",
+            # English
+            "locust", "locusts", "swarm", "outbreak",
+            # Malagasy (approximations courantes)
             "valala", "andiam-balala", "kijeja", "zana-balala",
-            "malagasy", "madagasikara"
         ]
+
+        self.geo_keywords = [
+            # Country
+            "madagascar", "madagaskar", "malagasy", "malgache", "madagasikara",
+
+            # Old province
+            "antananarivo", "antsiranana", "mahajanga", "toliara", "tuléar", "fianarantsoa", "toamasina", "tamatave",
+
+            # States / provinces
+            "atsimo-andrefana", "androy", "anôsy", "menabe", "melaky",
+            "boeny", "sofia", "diana",
+            "amoron'i mania", "haute matsiatra", "vatovavy fitovinany",
+            "atsinanana", "analanjirofo",
+            "itasy", "vakinankaratra", "alaotra-mangoro", "bongolava",
+        ]
+
         self.driver = webdriver.Chrome()
         self.wait = WebDriverWait(self.driver, 10)
         self.driver.get("https://news.google.com/rss/articles/CBMikgFBVV95cUxNVTQtYndlMjRSSlBKaEd5MmxaVHlGT1NkV0VFbEFTMFlmTXp2aW1YRWlrYmxJS0pjS1phZTlObm1ER1VtNWxzVnh4M3ZWVVhhWDJLTVJkUHRiOGJtb3NXekNOWEgybTNCOER5NjV4TkNwcUczTlZ0WnhxVHlMcFdLVGhyTTFrM1N3ODRpNF9GQ21EUQ?oc=5")
@@ -43,6 +60,7 @@ class GoogleNewsRSScraper:
         
         # URL  flux RSS Google News for: Madagascar + criquets
         self.rss_url = "https://news.google.com/rss/search?q=criquet+madagascar&hl=fr&gl=MG&ceid=MG:fr"
+        self.rss_url_malagasy = "https://news.google.com/rss/search?q=valala+madagasikara&hl=mg&gl=MG&ceid=MG:mg"
         
     def fetch_rss_feed(self) -> List[Dict]:
         """Get and parse google news"""
@@ -67,11 +85,12 @@ class GoogleNewsRSScraper:
         summary = entry.get('summary', '').lower()
         
         combined_text = f"{title} {summary}"
+        combined_text = combined_text.lower()
         
         # Keyword list
-        has_locust_keyword = any(kw in combined_text for kw in 
-                                 ["criquet", "criquets", "locust", "locusts", "acridien", "essaim", "valala", "andiam-balala", "kijeja", "zana-balala"])
-        has_madagascar = "madagascar" in combined_text or "malgache" in combined_text or "malagasy" in combined_text or "madagasikara" in combined_text
+        has_locust_keyword = any(kw in combined_text for kw in self.thematic_keywords)
+        has_madagascar = any(kw in combined_text for kw in self.geo_keywords)
+        #"madagascar" in combined_text or "malgache" in combined_text or "malagasy" in combined_text or "madagasikara" in combined_text
         
         return has_locust_keyword and has_madagascar
     
