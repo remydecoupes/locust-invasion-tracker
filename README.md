@@ -80,8 +80,9 @@ Connect to [[website](https://remydecoupes.github.io/locust-invasion-tracker/)]
 
 | Date       | Feature / Change Added            | Description                                         | Impact on Data Coverage                          |
 |------------|-----------------------------------|-----------------------------------------------------|--------------------------------------------------|
-| 2026-02-06 | Extended geographic keyword list  | Added additional geographic keywords for Madagascar | +4 news articles collected, +10 new locations identified |
-| YYYY-MM-DD |                                   |                                                     |                                                  |
+| 2026-02-06 | Extended geographic keyword list  | Added additional geographic keywords for Madagascar | +4 news articles collected (from 2424.mg ), +10 new locations identified |
+| YYYY-MM-DD | Parse RSS flux in Malagasy        |                                                     |                                                  |
+| YYYY-MM-DD | Map: display both polygon and points |                                                     |                                                  |
 
 
 ## Disclaimer & Intended Use
