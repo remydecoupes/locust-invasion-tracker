@@ -39,12 +39,29 @@ class GoogleNewsRSScraper:
             # Old province
             "antananarivo", "antsiranana", "mahajanga", "toliara", "tuléar", "fianarantsoa", "toamasina", "tamatave",
 
-            # States / provinces
-            "atsimo-andrefana", "androy", "anôsy", "menabe", "melaky",
-            "boeny", "sofia", "diana",
-            "amoron'i mania", "haute matsiatra", "vatovavy fitovinany",
-            "atsinanana", "analanjirofo",
-            "itasy", "vakinankaratra", "alaotra-mangoro", "bongolava",
+            # Faritany 
+            "antananarivo", "antsiranana", "fianarantsoa", "mahajanga", "toamasina", "toliary",
+
+            # Region
+            "analamanga", "bongolava", "itasy", "vakinakaratra", "diana", "sava", "amoron'i mania", "atsimo atsinanana", 
+            "fitovinany", "haute matsiatra", "ihorombe", "vatovavy", "betsiboka", "boeny", "melaky", "sofia", "alaotra mangoro", 
+            "analanjirofo", "atsinanana", "androy", "anosy", "atsimo andrefana", "menabe",
+
+            # District
+            "ambohidratrimo", "andramasina", "anjozorobe", "ankazobe", "antananarivo atsimonandrano", "antananarivo avaradrano", 
+            "antananarivo renivohitra", "manjakandriana", "fenoarivobe", "tsiroanomandidy", "arivonimamo", "miarinariro", "soavinandriana", 
+            "ambatolampy", "antanifotsy", "antsirabe i", "antsirabe ii", "betafo", "faratsiho", "mandoto", "ambanja", "ambilobe", 
+            "antsiranana i", "antsiranana ii", "nosy-be", "andapa", "antalaha", "sambava", "vohemar", "ambatofinandrahana", "ambositra", 
+            "fandriana", "manandriana", "befotaka", "farafangana", "midongy-atsimo", "vangaindrano", "vondrozo", "ikongo", "manakara atsimo", 
+            "vohipeno", "ambalavao", "ambohimahasoa", "fianarantsoa i", "ikalamavony", "isandra", "lalangina", "vohibato", "iakora", "ihosy", 
+            "ivohibe", "ifanadiana", "mananjary", "nosy-varika", "kandreho", "maevatanana", "tsaratanana", "ambato boeni", "mahajanga i", 
+            "mahajanga ii", "marovoay", "mitsinjo", "soalala", "ambatomainty", "antsalova", "besalampy", "maintirano", "morafenobe", "analalava", 
+            "antsohihy", "bealanana", "befandriana nord", "mampikony", "mandritsara", "port-berge (boriziny-vaovao)", "ambatondrazaka", 
+            "amparafaravola", "andilamena", "anosibe-an'ala", "moramanga", "fenerive est", "mananara-avaratra", "maroantsetra", "sainte marie", 
+            "soanierana ivongo", "vavatenina", "antanambao manampontsy", "brickaville", "mahanoro", "marolambo", "toamasina i", "toamasina ii", 
+            "vatomandry", "ambovombe-androy", "bekily", "beloha", "tsihombe", "amboasary-atsimo", "betroka", "taolagnaro", "ampanihy ouest", 
+            "ankazoabo", "benenitra", "beroroha", "betioky atsimo", "morombe", "sakaraha", "toliary i", "toliary ii", "belo sur tsiribihina", 
+            "mahabо", "manja", "miandrivazo", "morondava",
         ]
 
         self.driver = webdriver.Chrome()
